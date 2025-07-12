@@ -1,0 +1,82 @@
+/* --------------------------------------------------------------
+   E‑Barkia – Admin custom styles
+   These rules sit on top of Bootstrap 5.
+-------------------------------------------------------------- */
+
+
+/* === Color Palette (override/additions) === */
+
+:root {
+    /* Primary brand (kept in sync with Bootstrap’s --bs-primary) */
+    --e‑primary: #0d6efd;
+    /* Accents */
+    --e‑primary‑light: #e7f1ff;
+    --e‑grey‑100: #f8f9fa;
+}
+
+
+/* === Global === */
+
+body {
+    background-color: var(--e‑grey‑100);
+}
+
+
+/* === Navbar === */
+
+.navbar-brand {
+    font-weight: 600;
+    letter-spacing: .2px;
+}
+
+
+/* === Cards & Widgets === */
+
+.card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.08);
+}
+
+.card-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+
+/* === Table Hover === */
+
+.table-hover>tbody>tr:hover {
+    background-color: var(--e‑primary‑light);
+}
+
+
+/* === Buttons === */
+
+.btn,
+.btn-sm {
+    border-radius: 0.5rem;
+}
+
+
+/* Badge inside relative buttons (for navbar link) */
+
+.btn .badge {
+    font-size: 0.75rem;
+    transform: translate(25%, -40%);
+}
+
+
+/* === Alerts === */
+
+.alert {
+    border-radius: 0.75rem;
+    box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.05);
+}
+
+
+/* === Chart Container padding fix === */
+
+#ebarkiaChart {
+    max-height: 240px;
+}

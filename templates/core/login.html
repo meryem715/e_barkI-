@@ -1,0 +1,174 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Connexion / Inscription</title>
+    <link href="{% static 'core/css/login_signup.css' %}" rel="stylesheet">
+    <script src="{% static 'core/js/login_signup.js' %}" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+</head>
+<body>
+<div class="container right-panel-active" id="container">
+
+    <!-- Formulaire d'inscription -->
+    <div class="form-container sign-up-container">
+        <form method="post" action="{% url 'signup' %}">
+            {% csrf_token %}
+            <h1>Créer un compte</h1>
+
+            <input type="text" name="intitulé" placeholder="Intitulé" required />
+
+            <input type="text" name="ice" placeholder="ICE" required pattern="\d{16}" maxlength="16"
+                   title="L'ICE doit contenir exactement 16 chiffres (pas de lettres)" />
+            <small id="ice-error" style="color:red; font-size:12px;"></small>
+
+            <select name="type" required>
+                <option value="">Choisir une organisation</option>
+                <option value="entreprise">Entreprise</option>
+                <option value="association">Association</option>
+                <option value="societe">Société</option>
+                <option value="administration">Administration</option>
+            </select>
+
+            <input type="email" name="email" placeholder="Email" required />
+            <small id="email-error" style="color:red; font-size:12px;"></small>
+
+            <input type="text" name="gsm" placeholder="GSM" required pattern="\d+" title="Le numéro doit contenir uniquement des chiffres." />
+            <small id="gsm-error" style="color:red; font-size:12px;"></small>
+
+            <select name="ville" id="id_ville" 
+                    hx-get="/load-quartiers/" 
+                    hx-target="#id_quartier" 
+                    hx-trigger="change">
+                <option value="">Choisir une ville</option>
+                {% for ville in villes %}
+                    <option value="{{ ville.id }}">{{ ville.nom }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="quartier" id="id_quartier">
+                <option value="">Choisir un quartier</option>
+            </select>
+
+            <input type="text" name="rue" placeholder="Rue" required />
+            <button type="submit">S'inscrire</button>
+        </form>
+    </div>
+
+    <!-- Formulaire de connexion -->
+    <div class="form-container sign-in-container">
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <h1>Connexion</h1>
+            <span>Utilisez votre compte</span>
+            <input type="email" name="username" placeholder="Email" required />
+            <input type="password" name="password" placeholder="Mot de passe" required />
+            <button type="submit">Connexion</button>
+        </form>
+    </div>
+
+    <!-- Overlays -->
+    <div class="overlay-container">
+        <div class="overlay">
+            <div class="overlay-panel overlay-left">
+                <h1>Bienvenue !</h1>
+                <p>Connectez-vous pour continuer</p>
+                <button class="ghost" id="signIn">Se connecter</button>
+            </div>
+            <div class="overlay-panel overlay-right">
+                <h1>Bonjour !</h1>
+                <p>Entrez vos infos et commencez avec nous</p>
+                <button class="ghost" id="signUp">S'inscrire</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form[action="{% url 'signup' %}"]');
+    const iceInput = document.querySelector('input[name="ice"]');
+    const emailInput = document.querySelector('input[name="email"]');
+    const gsmInput = document.querySelector('input[name="gsm"]');
+
+    const iceError = document.getElementById('ice-error');
+    const emailError = document.getElementById('email-error');
+    const gsmError = document.getElementById('gsm-error');
+
+    const villeSelect = document.getElementById("id_ville");
+    const quartierSelect = document.getElementById("id_quartier");
+
+    form.addEventListener('submit', function (e) {
+        let valid = true;
+
+        if (!/^\d{16}$/.test(iceInput.value.trim())) {
+            e.preventDefault();
+            iceError.textContent = "L'ICE doit contenir exactement 16 chiffres";
+            iceInput.style.border = "2px solid red";
+            valid = false;
+        } else {
+            iceError.textContent = "";
+            iceInput.style.border = "";
+        }
+
+        if (!emailInput.value.includes('@')) {
+            e.preventDefault();
+            emailError.textContent = "L'email doit contenir un '@'";
+            emailInput.style.border = "2px solid red";
+            valid = false;
+        } else {
+            emailError.textContent = "";
+            emailInput.style.border = "";
+        }
+
+        if (!/^\d+$/.test(gsmInput.value.trim())) {
+            e.preventDefault();
+            gsmError.textContent = "Le GSM doit contenir uniquement des chiffres";
+            gsmInput.style.border = "2px solid red";
+            valid = false;
+        } else {
+            gsmError.textContent = "";
+            gsmInput.style.border = "";
+        }
+
+        if (!valid) e.preventDefault();
+    });
+
+    villeSelect.addEventListener("change", function () {
+        const villeId = this.value;
+        const selectedQuartier = quartierSelect.value;
+
+        fetch(`/load-quartiers/?ville_id=${villeId}`)
+            .then(response => response.json())
+            .then(data => {
+                quartierSelect.innerHTML = '<option value="">Choisir un quartier</option>';
+
+                data.forEach(function (quartier) {
+                    const option = document.createElement("option");
+                    option.value = quartier.id;
+                    option.textContent = quartier.nom;
+                    if (quartier.id == selectedQuartier) {
+                        option.selected = true;
+                    }
+                    quartierSelect.appendChild(option);
+                });
+            });
+    });
+
+    quartierSelect.addEventListener("change", function () {
+        const quartierId = this.value;
+        fetch(`/get-ville-from-quartier/?quartier_id=${quartierId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.ville_id) {
+                    villeSelect.value = data.ville_id;
+                    villeSelect.dispatchEvent(new Event('change'));
+                }
+            });
+    });
+});
+</script>
+</body>
+</html>

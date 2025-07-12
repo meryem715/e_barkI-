@@ -1,0 +1,4 @@
+<option value="">Choisir un quartier</option>
+{% for quartier in quartiers %}
+    <option value="{{ quartier.id }}">{{ quartier.nom }}</option>
+{% endfor %}

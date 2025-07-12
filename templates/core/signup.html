@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription</title>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <h2>Formulaire d'inscription</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label for="id_ice">ICE :</label>
+        {{ form.ice }}<br>
+
+        <label for="id_intitulé">Intitulé :</label>
+        {{ form.intitulé }}<br>
+
+        <label for="id_type">Type :</label>
+        {{ form.type }}<br>
+
+        <label for="id_email">Email :</label>
+        {{ form.email }}<br>
+
+        <label for="id_gsm">Téléphone :</label>
+        {{ form.gsm }}<br>
+
+        <label for="id_ville">Ville :</label>
+        {{ form.ville }}<br>
+
+        <label for="id_quartier">Quartier :</label>
+        <select name="quartier" id="id_quartier">
+            <option value="">--- Sélectionnez une ville ---</option>
+        </select><br>
+
+        <label for="id_rue">Rue :</label>
+        {{ form.rue }}<br>
+
+        <button type="submit">Envoyer</button>
+    </form>
+</body>
+</html>

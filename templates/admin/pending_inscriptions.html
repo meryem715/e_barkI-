@@ -1,0 +1,48 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Inscriptions en attente{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <h1 class="h3 mb-4">Inscriptions en attente <span class="badge bg-secondary">{{ pendings|length }}</span></h1>
+
+  {% if pendings %}
+  <div class="table-responsive shadow rounded-3 overflow-hidden">
+    <table class="table table-hover align-middle m-0">
+      <thead class="table-light">
+        <tr>
+          <th scope="col">Email</th>
+          <th scope="col">ICE</th>
+          <th scope="col">Intitulé</th>
+          <th scope="col">Ville</th>
+          <th scope="col">Quartier</th>
+          <th scope="col" class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ins in pendings %}
+        <tr>
+          <td>{{ ins.email }}</td>
+          <td>{{ ins.ice }}</td>
+          <td>{{ ins.intitulé }}</td>
+          <td>{{ ins.ville.nom }}</td>
+          <td>{{ ins.quartier.nom }}</td>
+          <td class="text-end">
+            <form action="{% url 'approve_inscription' ins.id %}" method="post" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-success">
+                <i class="bi bi-check-circle"></i> Approuver
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="alert alert-info">Aucune inscription en attente pour le moment.</div>
+  {% endif %}
+</div>
+{% endblock %}
