@@ -185,3 +185,11 @@ def get_ville_from_quartier(request):
         return JsonResponse({'ville_id': quartier.ville.id})
     except Quartier.DoesNotExist:
         return JsonResponse({}, status=404)
+
+from django.shortcuts import render
+
+def editeur_telegramme(request):
+    return render(request, 'core/editeur_telegramme.html')
+
+
+

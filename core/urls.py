@@ -20,4 +20,9 @@ urlpatterns = [
     # ---------------------------------------------------------------------
     path('load-quartiers/', views.load_quartiers, name='load_quartiers'),
     path('get-ville-from-quartier/', views.get_ville_from_quartier, name='get_ville_from_quartier'),
+    # autres routes...
+    path('e-barkia/editeur/', views.editeur_telegramme, name='editeur_telegramme'),
 ]
+
+
+
