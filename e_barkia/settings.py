@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+
 ]
 
 MIDDLEWARE = [
@@ -131,6 +132,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # pour test local
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # pour production
-
 
 

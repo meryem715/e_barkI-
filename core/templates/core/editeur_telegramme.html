@@ -1,184 +1,1510 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Éditeur de Télégramme</title>
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-bold-solid/css/uicons-bold-solid.css">
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-straight/css/uicons-regular-straight.css">
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css">
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-css/css/uicons-regular.css">
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-rounded/css/uicons-rounded.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f6f5f7;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application de Télégrammes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    .sidebar {
-      width: 60px;
-      background-color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 10px 0;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-    }
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
 
-    .sidebar i {
-      font-size: 24px;
-      color: #333;
-      margin: 20px 0;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
+        /* Barre latérale */
+        .sidebar {
+            width: 80px;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            z-index: 100;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
 
-    .sidebar i:hover {
-      color: #ff4b2b;
-    }
+        .sidebar-item {
+            width: 100%;
+            padding: 15px 0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
 
-    .template-panel {
-      width: 250px;
-      background: #fff;
-      padding: 20px;
-      border-right: 1px solid #ddd;
-      display: none;
-      flex-direction: column;
-    }
+        .sidebar-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
 
-    .template-panel h3 {
-      font-size: 16px;
-      margin-bottom: 15px;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 5px;
-    }
+        .sidebar-item i {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
 
-    .template-panel ul {
-      list-style-type: none;
-      padding: 0;
-    }
+        .sidebar-item span {
+            font-size: 12px;
+            opacity: 0.8;
+        }
 
-    .template-panel ul li {
-      padding: 10px;
-      margin-bottom: 5px;
-      background: #f5f5f5;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-    }
+        .sidebar-item.active {
+            background-color: rgba(255,255,255,0.2);
+        }
 
-    .template-panel ul li:hover {
-      background-color: #e0e0e0;
-    }
+        /* Contenu principal */
+        .main-content {
+            margin-left: 80px;
+            flex: 1;
+            padding: 30px;
+            transition: margin-left 0.3s ease;
+        }
 
-    .main-preview {
-      flex: 1;
-      padding: 40px;
-      overflow-y: auto;
-      display: flex;
-      justify-content: center;
-    }
+        /* Page d'accueil */
+        .home-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 80px);
+            text-align: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
 
-    .preview-container {
-      background: white;
-      width: 700px;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
+        .welcome-title {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
 
-    h1, p {
-      text-align: center;
-    }
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            max-width: 600px;
+            line-height: 1.6;
+        }
 
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      font-size: 14px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
+        .welcome-icon {
+            font-size: 80px;
+            color: #3498db;
+            margin-bottom: 30px;
+        }
 
-    .action-button {
-      background-color: #ff4b2b;
-      color: white;
-      padding: 12px 25px;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
-      font-size: 14px;
-      display: block;
-      margin: 20px auto 0;
-    }
-  </style>
+        /* Panneau des modèles */
+        .templates-panel {
+            position: fixed;
+            left: 80px;
+            top: 0;
+            width: 0;
+            height: 100vh;
+            background-color: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: width 0.3s ease;
+            overflow-x: hidden;
+            z-index: 90;
+        }
+
+        .templates-panel.open {
+            width: 300px;
+        }
+
+        .templates-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .templates-header h2 {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .close-templates {
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .templates-list {
+            padding: 20px;
+        }
+
+        .template-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+            border-left: 4px solid transparent;
+        }
+
+        .template-item:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .template-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .template-info {
+            flex: 1;
+        }
+
+        .template-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .template-desc {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .template-warning .template-icon {
+            background-color: #e74c3c;
+        }
+
+        .template-congratulations .template-icon {
+            background-color: #2ecc71;
+        }
+
+        .template-thanks .template-icon {
+            background-color: #f39c12;
+        }
+
+        .template-transactional .template-icon {
+            background-color: #3498db;
+        }
+
+        .price-tag {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.9rem;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+        }
+
+        .price-tag i {
+            margin-right: 10px;
+            color: #2ecc71;
+        }
+
+        /* Page d'édition - Design amélioré */
+        .editor-page {
+            display: none;
+            height: 100vh;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .editor-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .editor-body {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        .editor-sidebar {
+            width: 250px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+        }
+
+        .editor-main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-toolbar {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-btn {
+            background-color: white;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .toolbar-btn:hover {
+            background-color: #e9ecef;
+        }
+
+        .editor-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-textarea {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            resize: none;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .editor-textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+        }
+
+        .editor-footer {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .word-count {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .cost-estimate {
+            font-size: 0.9rem;
+            color: #2ecc71;
+            font-weight: 500;
+        }
+
+        /* Pages de liste */
+        .list-page {
+            display: none;
+            height: 100vh;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .list-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .list-body {
+            padding: 20px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .telegram-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #3498db;
+        }
+
+        .telegram-item:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .telegram-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .telegram-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .telegram-type {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            color: white;
+        }
+
+        .telegram-type.warning {
+            background-color: #e74c3c;
+        }
+
+        .telegram-type.congratulations {
+            background-color: #2ecc71;
+        }
+
+        .telegram-type.thanks {
+            background-color: #f39c12;
+        }
+
+        .telegram-type.transactional {
+            background-color: #3498db;
+        }
+
+        .telegram-preview {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .telegram-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #95a5a6;
+        }
+
+        /* Page de statistiques */
+        .stats-page {
+            display: none;
+            height: 100vh;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .stats-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .stats-body {
+            padding: 20px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .stats-chart {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .bar-chart {
+            display: flex;
+            height: 250px;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 0 20px;
+        }
+
+        .bar {
+            width: 40px;
+            background-color: #3498db;
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            transition: height 0.5s ease;
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .stats-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .stat-title {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .stat-change.positive {
+            color: #2ecc71;
+        }
+
+        .stat-change.negative {
+            color: #e74c3c;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 80;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification.success {
+            background-color: #2ecc71;
+        }
+
+        .notification.info {
+            background-color: #3498db;
+        }
+
+        .notification.warning {
+            background-color: #f39c12;
+        }
+
+        .notification.error {
+            background-color: #e74c3c;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .main-content {
+                margin-left: 60px;
+            }
+            
+            .templates-panel {
+                left: 60px;
+            }
+            
+            .welcome-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Barre latérale -->
+    <div class="sidebar">
+        <div class="sidebar-item" onclick="showHome()">
+            <i class="fas fa-home"></i>
+            <span>Accueil</span>
+        </div>
+        <div class="sidebar-item" onclick="showTemplates()">
+            <i class="fas fa-th-large"></i>
+            <span>Templates</span>
+        </div>
+        <div class="sidebar-item" onclick="showNewTelegram()">
+            <i class="fas fa-plus"></i>
+            <span>Nouveau</span>
+        </div>
+        <div class="sidebar-item" onclick="showStats()">
+            <i class="fas fa-chart-bar"></i>
+            <span>Statistiques</span>
+        </div>
+        <div class="sidebar-item" onclick="showSent()">
+            <i class="fas fa-paper-plane"></i>
+            <span>Envoyés</span>
+        </div>
+        <div class="sidebar-item" onclick="showArchives()">
+            <i class="fas fa-archive"></i>
+            <span>Archives</span>
+        </div>
+        <div class="sidebar-item" onclick="showDrafts()">
+            <i class="fas fa-file-alt"></i>
+            <span>Brouillons</span>
+        </div>
+    </div>
 
-  <!-- Barre latérale -->
-  <div class="sidebar">
-    <i class="fi fi-rs-home" title="Accueil"></i>
-    <i class="fi fi-rr-envelope" title="Templates" onclick="toggleTemplatePanel()"></i>
-    <i class="fi fi-rs-paper-plane" title="Télégrammes envoyés"></i>
-    <i class="fi fi-rs-code-pull-request-draft" title="Brouillons"></i>
-    <i class="fi fi-rr-box" title="Archive"></i>
-    <i class="fi fi-sr-add-document" title="Ajouter un télégramme"></i>
-    <i class="fi fi-rr-settings" title="Paramètres"></i>
-  </div>
+    <!-- Contenu principal -->
+    <div class="main-content">
+        <!-- Page d'accueil -->
+        <div class="home-page" id="homePage">
+            <i class="fas fa-paper-plane welcome-icon"></i>
+            <h1 class="welcome-title">Bienvenue sur l'application de télégrammes</h1>
+            <p class="welcome-subtitle">Une solution simple et efficace pour créer, gérer et envoyer vos télégrammes en toute simplicité.</p>
+        </div>
 
-  <!-- Panneau Templates -->
-  <div class="template-panel" id="templatePanel">
-    <h3>📋 Modèles</h3>
-    <ul>
-      <li>📄 Tous les modèles</li>
-      <li>🙏 Télégramme de remerciement</li>
-      <li>⚠️ Télégramme d'avertissement</li>
-      <li>💰 Télégramme transactionnel</li>
-      <li>🎉 Télégramme de félicitation</li>
-    </ul>
-  </div>
+        <!-- Panneau des modèles -->
+        <div class="templates-panel" id="templatesPanel">
+            <div class="templates-header">
+                <h2>Modèles de télégrammes</h2>
+                <i class="fas fa-times close-templates" onclick="closeTemplates()"></i>
+            </div>
+            <div class="templates-list">
+                <div class="template-item template-warning" onclick="openEditor('warning')">
+                    <div class="template-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="template-info">
+                        <div class="template-title">Avertissement</div>
+                        <div class="template-desc">Pour les notifications importantes</div>
+                    </div>
+                </div>
+                
+                <div class="template-item template-congratulations" onclick="openEditor('congratulations')">
+                    <div class="template-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="template-info">
+                        <div class="template-title">Félicitation</div>
+                        <div class="template-desc">Pour les messages joyeux</div>
+                    </div>
+                </div>
+                
+                <div class="template-item template-thanks" onclick="openEditor('thanks')">
+                    <div class="template-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="template-info">
+                        <div class="template-title">Remerciement</div>
+                        <div class="template-desc">Messages de gratitude</div>
+                    </div>
+                </div>
+                
+                <div class="template-item template-transactional" onclick="openEditor('transactional')">
+                    <div class="template-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="template-info">
+                        <div class="template-title">Transactionnel</div>
+                        <div class="template-desc">Pour les communications administratives</div>
+                    </div>
+                </div>
+            </div>
+            <div class="price-tag">
+                <i class="fas fa-tag"></i>
+                💰 0,25 DH par mot
+            </div>
+        </div>
 
-  <!-- Zone d'édition principale -->
-  <div class="main-preview">
-    <div class="preview-container" id="dropzone">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/GBAM_LOGO_%281%29.png" alt="Logo télégramme"
-           style="width: 30%; border-radius: 50px; margin: 0 auto 30px; display: block;" />
-      <h1>Votre télégramme commence ici !</h1>
-      <p>Exprimez-vous en toute simplicité. Avec votre message personnalisé.</p>
-  
+        <!-- Page d'édition - Design amélioré avec zone de rédaction latérale -->
+        <div class="editor-page" id="editorPage">
+            <div class="editor-header">
+                <div class="editor-title">Éditer le télégramme</div>
+                <div class="editor-actions">
+                    <button class="btn btn-outline" onclick="saveAsDraft()">
+                        <i class="fas fa-save"></i> Brouillon
+                    </button>
+                    <button class="btn btn-secondary" onclick="archiveTelegram()">
+                        <i class="fas fa-archive"></i> Archiver
+                    </button>
+                    <button class="btn btn-primary" onclick="sendTelegram()">
+                        <i class="fas fa-paper-plane"></i> Envoyer
+                    </button>
+                </div>
+            </div>
+            
+            <div class="editor-body">
+                <div class="editor-sidebar">
+                    <div class="form-group">
+                        <label for="telegramSubject">Objet</label>
+                        <input type="text" class="form-control" id="telegramSubject" placeholder="Saisissez l'objet du télégramme">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telegramType">Type</label>
+                        <select class="form-control" id="telegramType">
+                            <option value="warning">Avertissement</option>
+                            <option value="congratulations">Félicitation</option>
+                            <option value="thanks">Remerciement</option>
+                            <option value="transactional">Transactionnel</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telegramPriority">Priorité</label>
+                        <select class="form-control" id="telegramPriority">
+                            <option value="low">Faible</option>
+                            <option value="medium">Moyenne</option>
+                            <option value="high">Élevée</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telegramWordCount">Nombre de mots</label>
+                        <input type="text" class="form-control" id="telegramWordCount" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telegramCost">Coût total</label>
+                        <input type="text" class="form-control" id="telegramCost" readonly>
+                    </div>
+                </div>
+                
+                <div class="editor-main">
+                    <div class="editor-toolbar">
+                        <button class="toolbar-btn" onclick="formatText('bold')"><i class="fas fa-bold"></i></button>
+                        <button class="toolbar-btn" onclick="formatText('italic')"><i class="fas fa-italic"></i></button>
+                        <button class="toolbar-btn" onclick="formatText('underline')"><i class="fas fa-underline"></i></button>
+                        <button class="toolbar-btn" onclick="formatText('alignLeft')"><i class="fas fa-align-left"></i></button>
+                        <button class="toolbar-btn" onclick="formatText('alignCenter')"><i class="fas fa-align-center"></i></button>
+                        <button class="toolbar-btn" onclick="formatText('alignRight')"><i class="fas fa-align-right"></i></button>
+                        <button class="toolbar-btn" onclick="formatText('insertList')"><i class="fas fa-list"></i></button>
+                        <button class="toolbar-btn" onclick="formatText('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
+                        <button class="toolbar-btn" onclick="formatText('insertLink')"><i class="fas fa-link"></i></button>
+                        <button class="toolbar-btn" onclick="formatText('insertImage')"><i class="fas fa-image"></i></button>
+                    </div>
+                    
+                    <div class="editor-content">
+                        <textarea class="editor-textarea" id="telegramContent" placeholder="Rédigez votre télégramme ici..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script>
-    function toggleTemplatePanel() {
-      const panel = document.getElementById("templatePanel");
-      panel.style.display = (panel.style.display === "none" || panel.style.display === "") ? "flex" : "none";
-    }
+        <!-- Page des envoyés -->
+        <div class="list-page" id="sentPage">
+            <div class="list-header">
+                <div class="list-title">Télégrammes Envoyés</div>
+                <button class="btn btn-outline" onclick="clearList('sent')">
+                    <i class="fas fa-trash"></i> Vider
+                </button>
+            </div>
+            <div class="list-body" id="sentList">
+                <!-- Contenu dynamique -->
+            </div>
+        </div>
 
-    function updatePrix() {
-      const text = document.getElementById("telegram-message").value.trim();
-      const wordCount = text ? text.split(/\s+/).length : 0;
-      const price = (wordCount * 0.25).toFixed(2);
-      document.getElementById("word-count").textContent = wordCount;
-      document.getElementById("price").textContent = price;
-    }
+        <!-- Page des archives -->
+        <div class="list-page" id="archivesPage">
+            <div class="list-header">
+                <div class="list-title">Télégrammes Archivés</div>
+                <button class="btn btn-outline" onclick="clearList('archives')">
+                    <i class="fas fa-trash"></i> Vider
+                </button>
+            </div>
+            <div class="list-body" id="archivesList">
+                <!-- Contenu dynamique -->
+            </div>
+        </div>
 
-    function downloadPDF() {
-      const element = document.getElementById("dropzone");
-      html2pdf().set({
-        margin: 0.5,
-        filename: 'telegramme.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-      }).from(element).save();
-    }
-  </script>
+        <!-- Page des brouillons -->
+        <div class="list-page" id="draftsPage">
+            <div class="list-header">
+                <div class="list-title">Brouillons</div>
+                <button class="btn btn-outline" onclick="clearList('drafts')">
+                    <i class="fas fa-trash"></i> Vider
+                </button>
+            </div>
+            <div class="list-body" id="draftsList">
+                <!-- Contenu dynamique -->
+            </div>
+        </div>
 
+        <!-- Page de statistiques -->
+        <div class="stats-page" id="statsPage">
+            <div class="stats-header">
+                <div class="stats-title">Statistiques Mensuelles</div>
+                <button class="btn btn-outline" onclick="showHome()">
+                    <i class="fas fa-home"></i> Accueil
+                </button>
+            </div>
+            <div class="stats-body">
+                <div class="stats-chart">
+                    <div class="chart-title">Télégrammes par type</div>
+                    <div class="chart-container">
+                        <div class="bar-chart" id="typeChart">
+                            <!-- Barres générées dynamiquement -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-summary">
+                    <div class="stat-card">
+                        <div class="stat-title">Total des télégrammes</div>
+                        <div class="stat-value" id="totalTelegrams">0</div>
+                        <div class="stat-change positive" id="totalChange">+0% ce mois</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-title">Total des mots</div>
+                        <div class="stat-value" id="totalWords">0</div>
+                        <div class="stat-change positive" id="wordsChange">+0% ce mois</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-title">Revenus générés</div>
+                        <div class="stat-value" id="totalRevenue">0 DH</div>
+                        <div class="stat-change positive" id="revenueChange">+0% ce mois</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="closeTemplates()"></div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Variables globales
+        let currentTemplate = '';
+        let currentTelegram = null;
+        let telegrams = {
+            drafts: [],
+            sent: [],
+            archives: []
+        };
+        let wordCount = 0;
+        let costPerWord = 0.25;
+        let stats = {
+            monthly: {
+                warning: 0,
+                congratulations: 0,
+                thanks: 0,
+                transactional: 0
+            },
+            total: 0,
+            totalWords: 0,
+            totalRevenue: 0
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTelegrams();
+            updateWordCount();
+            generateStats();
+        });
+
+        // Afficher la page d'accueil
+        function showHome() {
+            document.getElementById('homePage').style.display = 'flex';
+            document.getElementById('editorPage').style.display = 'none';
+            document.getElementById('sentPage').style.display = 'none';
+            document.getElementById('archivesPage').style.display = 'none';
+            document.getElementById('draftsPage').style.display = 'none';
+            document.getElementById('statsPage').style.display = 'none';
+            
+            // Mettre à jour la sidebar
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector('.sidebar-item:nth-child(1)').classList.add('active');
+        }
+
+        // Afficher le panneau des modèles
+        function showTemplates() {
+            document.getElementById('templatesPanel').classList.add('open');
+            document.getElementById('overlay').classList.add('active');
+            
+            // Mettre à jour la sidebar
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector('.sidebar-item:nth-child(2)').classList.add('active');
+        }
+
+        // Fermer le panneau des modèles
+        function closeTemplates() {
+            document.getElementById('templatesPanel').classList.remove('open');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        // Créer un nouveau télégramme
+        function showNewTelegram() {
+            currentTemplate = 'new';
+            openEditor('new');
+            
+            // Mettre à jour la sidebar
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector('.sidebar-item:nth-child(3)').classList.add('active');
+        }
+
+        // Ouvrir l'éditeur avec un modèle
+        function openEditor(template) {
+            currentTemplate = template;
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('editorPage').style.display = 'block';
+            document.getElementById('sentPage').style.display = 'none';
+            document.getElementById('archivesPage').style.display = 'none';
+            document.getElementById('draftsPage').style.display = 'none';
+            document.getElementById('statsPage').style.display = 'none';
+            
+            // Pré-remplir avec le modèle approprié
+            const content = document.getElementById('telegramContent');
+            const subject = document.getElementById('telegramSubject');
+            const type = document.getElementById('telegramType');
+            
+            type.value = template;
+            
+            switch(template) {
+                case 'warning':
+                    subject.value = "Avertissement important";
+                    content.value = "Nous vous informons par la présente d'une situation nécessitant votre attention...\n\nVeuillez prendre les mesures appropriées.";
+                    break;
+                case 'congratulations':
+                    subject.value = "Félicitations";
+                    content.value = "Nous vous félicitons chaleureusement pour votre réussite...\n\nNos sincères félicitations !";
+                    break;
+                case 'thanks':
+                    subject.value = "Remerciements";
+                    content.value = "Nous tenons à vous exprimer notre profonde gratitude pour...\n\nMerci infiniment pour votre soutien.";
+                    break;
+                case 'transactional':
+                    subject.value = "Information transactionnelle";
+                    content.value = "Nous vous informons que votre transaction a été traitée avec succès...\n\nVeuillez trouver ci-joint les détails.";
+                    break;
+                case 'new':
+                    subject.value = "";
+                    content.value = "";
+                    break;
+            }
+            
+            currentTelegram = null;
+            updateWordCount();
+            closeTemplates();
+        }
+
+        // Sauvegarder en brouillon
+        function saveAsDraft() {
+            const telegram = {
+                id: Date.now(),
+                subject: document.getElementById('telegramSubject').value,
+                content: document.getElementById('telegramContent').value,
+                type: document.getElementById('telegramType').value,
+                priority: document.getElementById('telegramPriority').value,
+                date: new Date().toISOString(),
+                wordCount: wordCount
+            };
+            
+            telegrams.drafts.push(telegram);
+            saveTelegrams();
+            showNotification('Télégramme sauvegardé en brouillon', 'success');
+            
+            // Rediriger vers la page des brouillons
+            showDrafts();
+        }
+
+        // Archiver le télégramme
+        function archiveTelegram() {
+            // Vérifier si le télégramme existe déjà dans les archives
+            const telegramContent = document.getElementById('telegramContent').value;
+            const telegramSubject = document.getElementById('telegramSubject').value;
+            
+            // Vérifier si un télégramme avec le même contenu existe déjà
+            const existsInArchives = telegrams.archives.some(t => 
+                t.content === telegramContent && t.subject === telegramSubject
+            );
+            
+            if (existsInArchives) {
+                showNotification('Ce télégramme est déjà archivé', 'warning');
+                return;
+            }
+            
+            const telegram = {
+                id: Date.now(),
+                subject: telegramSubject,
+                content: telegramContent,
+                type: document.getElementById('telegramType').value,
+                priority: document.getElementById('telegramPriority').value,
+                date: new Date().toISOString(),
+                wordCount: wordCount
+            };
+            
+            telegrams.archives.push(telegram);
+            saveTelegrams();
+            showNotification('Télégramme archivé avec succès', 'info');
+            
+            // Rediriger vers la page des archives
+            showArchives();
+        }
+
+        // Envoyer le télégramme
+        function sendTelegram() {
+            const telegram = {
+                id: Date.now(),
+                subject: document.getElementById('telegramSubject').value,
+                content: document.getElementById('telegramContent').value,
+                type: document.getElementById('telegramType').value,
+                priority: document.getElementById('telegramPriority').value,
+                date: new Date().toISOString(),
+                wordCount: wordCount
+            };
+            
+            telegrams.sent.push(telegram);
+            saveTelegrams();
+            
+            // Mettre à jour les statistiques
+            stats.monthly[telegram.type]++;
+            stats.total++;
+            stats.totalWords += telegram.wordCount;
+            stats.totalRevenue += telegram.wordCount * costPerWord;
+            saveStats();
+            
+            showNotification(`Télégramme envoyé avec succès (Coût: ${telegram.wordCount * costPerWord} DH)`, 'success');
+            
+            // Rediriger vers la page des envoyés
+            showSent();
+        }
+
+        // Mettre à jour le compteur de mots et le coût
+        function updateWordCount() {
+            const content = document.getElementById('telegramContent').value;
+            wordCount = content.trim().split(/\s+/).filter(word => word.length > 0).length;
+            
+            document.getElementById('wordCount').textContent = wordCount;
+            document.getElementById('telegramWordCount').value = `${wordCount} mots`;
+            document.getElementById('telegramCost').value = `${(wordCount * costPerWord).toFixed(2)} DH`;
+            document.getElementById('costEstimate').textContent = (wordCount * costPerWord).toFixed(2) + ' DH';
+        }
+
+        // Formater le texte
+        function formatText(command, value = null) {
+            const textarea = document.getElementById('telegramContent');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            let formattedText = '';
+            
+            switch(command) {
+                case 'bold':
+                    formattedText = `**${selectedText}**`;
+                    break;
+                case 'italic':
+                    formattedText = `*${selectedText}*`;
+                    break;
+                case 'underline':
+                    formattedText = `__${selectedText}__`;
+                    break;
+                case 'alignLeft':
+                    formattedText = `<div style="text-align: left;">${selectedText}</div>`;
+                    break;
+                case 'alignCenter':
+                    formattedText = `<div style="text-align: center;">${selectedText}</div>`;
+                    break;
+                case 'alignRight':
+                    formattedText = `<div style="text-align: right;">${selectedText}</div>`;
+                    break;
+                case 'insertList':
+                    formattedText = `- ${selectedText}`;
+                    break;
+                case 'insertOrderedList':
+                    formattedText = `1. ${selectedText}`;
+                    break;
+                case 'insertLink':
+                    const url = prompt('Entrez l\'URL :', 'https://');
+                    if (url) {
+                        formattedText = `[${selectedText || 'Lien'}](${url})`;
+                    }
+                    break;
+                case 'insertImage':
+                    const imgSrc = prompt('Entrez l\'URL de l\'image :', 'https://');
+                    if (imgSrc) {
+                        formattedText = `![${selectedText || 'Image'}](${imgSrc})`;
+                    }
+                    break;
+            }
+            
+            if (formattedText) {
+                textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+                textarea.focus();
+                textarea.selectionStart = start + formattedText.length;
+                textarea.selectionEnd = start + formattedText.length;
+                updateWordCount();
+            }
+        }
+
+        // Afficher les brouillons
+        function showDrafts() {
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('editorPage').style.display = 'none';
+            document.getElementById('sentPage').style.display = 'none';
+            document.getElementById('archivesPage').style.display = 'none';
+            document.getElementById('draftsPage').style.display = 'block';
+            document.getElementById('statsPage').style.display = 'none';
+            
+            // Mettre à jour la sidebar
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector('.sidebar-item:nth-child(6)').classList.add('active');
+            
+            // Mettre à jour la liste
+            updateList('drafts');
+        }
+
+        // Afficher les envoyés
+        function showSent() {
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('editorPage').style.display = 'none';
+            document.getElementById('sentPage').style.display = 'block';
+            document.getElementById('archivesPage').style.display = 'none';
+            document.getElementById('draftsPage').style.display = 'none';
+            document.getElementById('statsPage').style.display = 'none';
+            
+            // Mettre à jour la sidebar
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector('.sidebar-item:nth-child(4)').classList.add('active');
+            
+            // Mettre à jour la liste
+            updateList('sent');
+        }
+
+        // Afficher les archives
+        function showArchives() {
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('editorPage').style.display = 'none';
+            document.getElementById('sentPage').style.display = 'none';
+            document.getElementById('draftsPage').style.display = 'none';
+            document.getElementById('statsPage').style.display = 'none';
+            
+            // Mettre à jour la sidebar
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector('.sidebar-item:nth-child(5)').classList.add('active');
+            
+            // Mettre à jour la liste
+            updateList('archives');
+        }
+
+        // Afficher les statistiques
+        function showStats() {
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('editorPage').style.display = 'none';
+            document.getElementById('sentPage').style.display = 'none';
+            document.getElementById('archivesPage').style.display = 'none';
+            document.getElementById('draftsPage').style.display = 'none';
+            document.getElementById('statsPage').style.display = 'block';
+            
+            // Mettre à jour la sidebar
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector('.sidebar-item:nth-child(3)').classList.add('active');
+            
+            // Mettre à jour les statistiques
+            generateStats();
+        }
+
+        // Mettre à jour la liste des télégrammes
+        function updateList(type) {
+            const listContainer = document.getElementById(`${type}List`);
+            listContainer.innerHTML = '';
+            
+            if (telegrams[type].length === 0) {
+                listContainer.innerHTML = '<div class="telegram-item">Aucun télégramme trouvé</div>';
+                return;
+            }
+            
+            telegrams[type].forEach(telegram => {
+                const item = document.createElement('div');
+                item.className = 'telegram-item';
+                item.onclick = () => openTelegram(telegram);
+                
+                const typeClass = `telegram-type ${telegram.type}`;
+                
+                item.innerHTML = `
+                    <div class="telegram-header">
+                        <div class="telegram-title">${telegram.subject}</div>
+                        <div class="${typeClass}">${getTypeLabel(telegram.type)}</div>
+                    </div>
+                    <div class="telegram-preview">${telegram.content.substring(0, 100)}${telegram.content.length > 100 ? '...' : ''}</div>
+                    <div class="telegram-meta">
+                        <span>${formatDate(telegram.date)}</span>
+                        <span>${telegram.wordCount} mots • ${telegram.wordCount * costPerWord} DH</span>
+                    </div>
+                `;
+                
+                listContainer.appendChild(item);
+            });
+        }
+
+        // Ouvrir un télégramme existant
+        function openTelegram(telegram) {
+            currentTelegram = telegram;
+            
+            document.getElementById('telegramSubject').value = telegram.subject;
+            document.getElementById('telegramContent').value = telegram.content;
+            document.getElementById('telegramType').value = telegram.type;
+            document.getElementById('telegramPriority').value = telegram.priority || 'medium';
+            
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('editorPage').style.display = 'block';
+            document.getElementById('sentPage').style.display = 'none';
+            document.getElementById('archivesPage').style.display = 'none';
+            document.getElementById('draftsPage').style.display = 'none';
+            document.getElementById('statsPage').style.display = 'none';
+            
+            updateWordCount();
+        }
+
+        // Vider une liste
+        function clearList(type) {
+            if (confirm(`Êtes-vous sûr de vouloir vider la liste des ${type === 'drafts' ? 'brouillons' : type === 'sent' ? 'envoyés' : 'archives'} ?`)) {
+                telegrams[type] = [];
+                saveTelegrams();
+                updateList(type);
+                showNotification(`Liste des ${type === 'drafts' ? 'brouillons' : type === 'sent' ? 'envoyés' : 'archives'} vidée`, 'info');
+            }
+        }
+
+        // Supprimer un télégramme
+        function deleteTelegram(id, type) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce télégramme ?')) {
+                telegrams[type] = telegrams[type].filter(telegram => telegram.id !== id);
+                saveTelegrams();
+                updateList(type);
+                showNotification('Télégramme supprimé avec succès', 'info');
+            }
+        }
+
+        // Sauvegarder les télégrammes dans localStorage
+        function saveTelegrams() {
+            localStorage.setItem('telegrams', JSON.stringify(telegrams));
+        }
+
+        // Charger les télégrammes depuis localStorage
+        function loadTelegrams() {
+            const saved = localStorage.getItem('telegrams');
+            if (saved) {
+                telegrams = JSON.parse(saved);
+            }
+        }
+
+        // Sauvegarder les statistiques
+        function saveStats() {
+            localStorage.setItem('telegramStats', JSON.stringify(stats));
+        }
+
+        // Charger les statistiques
+        function loadStats() {
+            const saved = localStorage.getItem('telegramStats');
+            if (saved) {
+                stats = JSON.parse(saved);
+            }
+        }
+
+        // Générer les statistiques
+        function generateStats() {
+            loadStats();
+            
+            // Mettre à jour le graphique
+            const chartContainer = document.getElementById('typeChart');
+            chartContainer.innerHTML = '';
+            
+            const maxCount = Math.max(
+                stats.monthly.warning,
+                stats.monthly.congratulations,
+                stats.monthly.thanks,
+                stats.monthly.transactional,
+                1 // Éviter la division par zéro
+            );
+            
+            const colors = {
+                warning: '#e74c3c',
+                congratulations: '#2ecc71',
+                thanks: '#f39c12',
+                transactional: '#3498db'
+            };
+            
+            const types = [
+                { name: 'Avertissement', key: 'warning', color: colors.warning },
+                { name: 'Félicitations', key: 'congratulations', color: colors.congratulations },
+                { name: 'Remerciements', key: 'thanks', color: colors.thanks },
+                { name: 'Transactionnel', key: 'transactional', color: colors.transactional }
+            ];
+            
+            types.forEach(type => {
+                const count = stats.monthly[type.key];
+                const percentage = (count / maxCount) * 100;
+                
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${percentage}%`;
+                bar.style.backgroundColor = type.color;
+                
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                label.textContent = type.name;
+                
+                const value = document.createElement('div');
+                value.className = 'bar-value';
+                value.textContent = count;
+                
+                bar.appendChild(label);
+                bar.appendChild(value);
+                chartContainer.appendChild(bar);
+            });
+            
+            // Mettre à jour les statistiques récapitulatives
+            document.getElementById('totalTelegrams').textContent = stats.total;
+            document.getElementById('totalWords').textContent = stats.totalWords;
+            document.getElementById('totalRevenue').textContent = `${stats.totalRevenue.toFixed(2)} DH`;
+            
+            // Calculer les changements mensuels (simulation)
+            const randomChange = Math.floor(Math.random() * 20) - 10; // -10% à +10%
+            document.getElementById('totalChange').textContent = `${randomChange > 0 ? '+' : ''}${randomChange}% ce mois`;
+            document.getElementById('totalChange').className = `stat-change ${randomChange >= 0 ? 'positive' : 'negative'}`;
+            
+            document.getElementById('wordsChange').textContent = `${randomChange > 0 ? '+' : ''}${randomChange}% ce mois`;
+            document.getElementById('wordsChange').className = `stat-change ${randomChange >= 0 ? 'positive' : 'negative'}`;
+            
+            document.getElementById('revenueChange').textContent = `${randomChange > 0 ? '+' : ''}${randomChange}% ce mois`;
+            document.getElementById('revenueChange').className = `stat-change ${randomChange >= 0 ? 'positive' : 'negative'}`;
+        }
+
+        // Afficher une notification
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Formater la date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Obtenir le libellé du type
+        function getTypeLabel(type) {
+            switch(type) {
+                case 'warning': return 'Avertissement';
+                case 'congratulations': return 'Félicitation';
+                case 'thanks': return 'Remerciement';
+                case 'transactional': return 'Transactionnel';
+                default: return 'Inconnu';
+            }
+        }
+
+        // Écouteur d'événement pour le compteur de mots
+        document.getElementById('telegramContent').addEventListener('input', updateWordCount);
+    </script>
 </body>
 </html>
